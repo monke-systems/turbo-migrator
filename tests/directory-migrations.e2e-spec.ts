@@ -34,10 +34,7 @@ describe('Directory migrations (e2e)', () => {
     setEnvs(['COMMANDS', 'migrate']);
     setEnvs(['MIGRATION_PROVIDER', 'directory']);
     setEnvs(['CREATE_DATABASE', 'true']);
-    setEnvs([
-      'MIGRATIONS_DIRECTORY',
-      getMigrationsDir(MIGRATIONS_DIR.DIRECTORY),
-    ]);
+    setEnvs(['MIGRATION_FILES', getMigrationsDir(MIGRATIONS_DIR.DIRECTORY)]);
 
     const { config } = await compileConfig(AppConfig);
 

@@ -35,10 +35,7 @@ describe('Typeorm migrations (e2e)', () => {
     setEnvs(['COMMANDS', 'migrate']);
     setEnvs(['MIGRATION_PROVIDER', 'typeorm']);
     setEnvs(['CREATE_DATABASE', 'true']);
-    setEnvs([
-      'MIGRATIONS_DIRECTORY',
-      getMigrationsDir(MIGRATIONS_DIR.TYPE_ORM),
-    ]);
+    setEnvs(['MIGRATION_FILES', getMigrationsDir(MIGRATIONS_DIR.TYPE_ORM)]);
 
     const { config } = await compileConfig(AppConfig);
 
@@ -51,10 +48,7 @@ describe('Typeorm migrations (e2e)', () => {
     setEnvs(['COMMANDS', 'migrate']);
     setEnvs(['MIGRATION_PROVIDER', 'typeorm']);
     setEnvs(['CREATE_DATABASE', 'true']);
-    setEnvs([
-      'MIGRATIONS_DIRECTORY',
-      getMigrationsDir(MIGRATIONS_DIR.TYPE_ORM),
-    ]);
+    setEnvs(['MIGRATION_FILES', getMigrationsDir(MIGRATIONS_DIR.TYPE_ORM)]);
     setEnvs(['MYSQL_PASSWORD', 'wrong_pass']);
 
     const { config } = await compileConfig(AppConfig);

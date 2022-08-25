@@ -49,7 +49,7 @@ export class AppConfig {
   mysql!: MysqlConfig;
 
   @ConfigField()
-  migrationsDirectory!: string;
+  migrationFiles!: string;
 
   @ConfigField()
   createDatabase: boolean = false;

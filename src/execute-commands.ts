@@ -29,7 +29,7 @@ export const executeCommands = async (
           createDatabase: config.createDatabase,
           datasource: {
             type: 'mariadb',
-            migrations: [config.migrationsDirectory],
+            migrations: [config.migrationFiles],
             ...config.mysql,
           },
         });
@@ -39,7 +39,7 @@ export const executeCommands = async (
           createDatabase: config.createDatabase,
           dbType: DIRECTORY_PROVIDER_DATABASE.MYSQL,
           mysql: config.mysql,
-          migrationsDirectory: config.migrationsDirectory,
+          migrationsDirectory: config.migrationFiles,
         });
     }
   }

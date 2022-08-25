@@ -1,3 +1,4 @@
+import * as util from 'util';
 import { compileConfig } from '@monkee/turbo-config';
 import { AppConfig } from './config';
 import { executeCommands } from './execute-commands';
@@ -7,7 +8,7 @@ const main = async () => {
 
   const res = await executeCommands(config);
 
-  console.log(res);
+  util.format(res);
 };
 
 main().catch(console.error);

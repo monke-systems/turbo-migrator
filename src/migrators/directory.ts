@@ -50,16 +50,21 @@ export const migrateFromDirectory = async (
 
     await connection.beginTransaction();
 
-    for (const migrationFile of filesToMigrate) {
-      const filePath = path.resolve(opts.migrationsDirectory, migrationFile);
-      const content = await fs.readFile(filePath, 'utf-8');
+    try {
+      for (const migrationFile of filesToMigrate) {
+        const filePath = path.resolve(opts.migrationsDirectory, migrationFile);
+        const content = await fs.readFile(filePath, 'utf-8');
 
-      logger.info('Execute', filePath);
-      await connection.query(content);
+        logger.info('Execute', filePath);
+        await connection.query(content);
+      }
+      await connection.commit();
+    } catch (e) {
+      await connection.rollback();
+      throw e;
+    } finally {
+      await connection.end();
     }
-
-    await connection.commit();
-    await connection.end();
 
     logger.info('Connection closed');
 
