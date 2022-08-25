@@ -1,2 +1,3 @@
 # turbo-migrator
-Migration manager
+
+[Config reference](CONFIG_REFERENCE.MD)

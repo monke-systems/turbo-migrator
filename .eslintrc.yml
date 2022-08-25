@@ -1,0 +1,13 @@
+root: true
+parserOptions:
+  project: tsconfig.json
+  sourceType: module
+env:
+  node: true
+  jest: true
+extends:
+  - '@monkee/eslint-config/typescript'
+overrides:
+  - files: ['tests/files/typeorm-migrations/*.ts']
+    rules:
+      '@typescript-eslint/naming-convention': 0

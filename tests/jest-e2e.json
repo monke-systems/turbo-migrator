@@ -1,0 +1,12 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testTimeout": 100000,
+  "testRegex": ".e2e-spec.ts$",
+  "setupFiles": ["dotenv/config"],
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "verbose": false
+}

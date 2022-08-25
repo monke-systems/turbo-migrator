@@ -1,0 +1,11 @@
+.git
+.vscode
+development.docker-compose.yml
+README.md
+.husky
+tests
+
+# Node Files #
+node_modules
+npm-debug.log
+npm-debug.log.*
