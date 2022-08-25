@@ -22,7 +22,9 @@ export type MigrateFromDirectoryResult = {
 export const migrateFromDirectory = async (
   opts: MigrateFromDirectoryOpts,
 ): Promise<MigrateFromDirectoryResult> => {
-  const logger = new Logger();
+  const logger = new Logger({
+    enableBuffer: false,
+  });
 
   if (opts.dbType === DIRECTORY_PROVIDER_DATABASE.MYSQL) {
     if (opts.createDatabase) {
@@ -30,7 +32,7 @@ export const migrateFromDirectory = async (
       const conn = await mysql.createConnection(withoutDatabase);
 
       logger.info('Creating database', opts.mysql.database);
-      await conn.query(`CREATE DATABASE ${opts.mysql.database}`);
+      await conn.query(`CREATE DATABASE IF NOT EXISTS ${opts.mysql.database}`);
       await conn.end();
     }
 

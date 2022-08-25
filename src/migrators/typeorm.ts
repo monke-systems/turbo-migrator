@@ -19,7 +19,9 @@ export type TypeOrmMigrateResult = {
 export const migrateTypeOrm = async (
   opts: MigrateTypeOrmOpts,
 ): Promise<TypeOrmMigrateResult> => {
-  const logger = new Logger();
+  const logger = new Logger({
+    enableBuffer: false,
+  });
 
   try {
     if (opts.createDatabase) {
@@ -39,7 +41,9 @@ export const migrateTypeOrm = async (
       });
 
       logger.info('Creating database', opts.datasource.database);
-      await connection.query(`CREATE DATABASE ${opts.datasource.database}`);
+      await connection.query(
+        `CREATE DATABASE IF NOT EXISTS ${opts.datasource.database}`,
+      );
       await connection.end();
 
       logger.info(`Database ${opts.datasource.database} created`);
