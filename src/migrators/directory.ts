@@ -40,7 +40,10 @@ export const migrateFromDirectory = async (
     logger.info('Connecting to', opts.mysql.host);
 
     const { username, ...withoutUsername } = opts.mysql;
-    const connection = await mysql.createConnection(withoutUsername);
+    const connection = await mysql.createConnection({
+      ...withoutUsername,
+      multipleStatements: true,
+    });
 
     const filesToMigrate = glob.sync(opts.migrationsDirectory);
     logger.info('Found files to migrate', filesToMigrate);
@@ -62,7 +65,7 @@ export const migrateFromDirectory = async (
 
     return {
       appliedFiles: filesToMigrate,
-      log: logger.flushBuffer().join('\n'),
+      log: logger.flushBuffer().join(),
     };
   } else {
     throw new DirectoryMigrationErr(`Unsupported db type '${opts.dbType}'`);

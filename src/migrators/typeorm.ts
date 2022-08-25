@@ -63,7 +63,7 @@ export const migrateTypeOrm = async (
 
     return {
       appliedMigrations: res,
-      log: logger.flushBuffer().join('\n'),
+      log: logger.flushBuffer().join(),
     };
   } catch (e) {
     throw new TypeormMigrationErr(isError(e) ? e.message : 'Unknown err');
