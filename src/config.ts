@@ -52,5 +52,9 @@ export class AppConfig {
   migrationFiles!: string;
 
   @ConfigField()
+  @IsOptional()
+  migrateTo?: string;
+
+  @ConfigField()
   createDatabase: boolean = false;
 }

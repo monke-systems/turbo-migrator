@@ -1,22 +1,24 @@
 # Turbo migrator config reference
 
-**commands**: array; *required*
+**COMMANDS**: array; *required*
 
-**migrationProvider**: string; *required*
+**MIGRATION_PROVIDER**: string; *required*
 
-**mysql.database**: string; *required*
+**MYSQL_DATABASE**: string; *required*
 
-**mysql.host**: string; *required*
+**MYSQL_HOST**: string; *required*
 
-**mysql.port**: number; *default 3306*
+**MYSQL_PORT**: number; *default 3306*
 
-**mysql.user**: string; *required*
+**MYSQL_USER**: string; *required*
 
-**mysql.user**: string; *required*
+**MYSQL_USER**: string; *required*
 
-**mysql.password**: string; *required*
+**MYSQL_PASSWORD**: string; *required*
 
-**migrationsDirectory**: string; *required*
+**MIGRATION_FILES**: string; *required*
 
-**createDatabase**: boolean; *default false*
+**MIGRATE_TO**: string;
+
+**CREATE_DATABASE**: boolean; *default false*
 

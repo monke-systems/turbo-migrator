@@ -40,7 +40,7 @@ describe('Directory migrations (e2e)', () => {
 
     const res = await executeCommands(config);
 
-    expect(res.migration?.directory?.appliedFiles).toHaveLength(2);
+    expect(res.migration?.directory?.appliedFiles).toHaveLength(3);
 
     await mysqlConnection!.query(`USE ${currentDatabaseName}`);
     const testInsert = () =>
@@ -52,5 +52,38 @@ describe('Directory migrations (e2e)', () => {
       ]);
 
     await expect(testInsert()).resolves.not.toThrow();
+  });
+
+  it('Double migration from directory', async () => {
+    setEnvs(['COMMANDS', 'migrate']);
+    setEnvs(['MIGRATION_PROVIDER', 'directory']);
+    setEnvs(['CREATE_DATABASE', 'true']);
+    setEnvs(['MIGRATION_FILES', getMigrationsDir(MIGRATIONS_DIR.DIRECTORY)]);
+
+    const { config } = await compileConfig(AppConfig);
+
+    await executeCommands(config);
+
+    const res = await executeCommands(config);
+
+    expect(res.migration?.directory?.appliedFiles).toHaveLength(0);
+  });
+
+  it('Step by step migration from directory', async () => {
+    setEnvs(['COMMANDS', 'migrate']);
+    setEnvs(['MIGRATION_PROVIDER', 'directory']);
+    setEnvs(['CREATE_DATABASE', 'true']);
+    setEnvs(['MIGRATE_TO', '1562586898-second']);
+    setEnvs(['MIGRATION_FILES', getMigrationsDir(MIGRATIONS_DIR.DIRECTORY)]);
+
+    const { config } = await compileConfig(AppConfig);
+
+    const res = await executeCommands(config);
+    expect(res.migration?.directory?.appliedFiles).toHaveLength(2);
+
+    config.migrateTo = undefined;
+
+    const res2 = await executeCommands(config);
+    expect(res2.migration?.directory?.appliedFiles).toHaveLength(1);
   });
 });

@@ -40,6 +40,7 @@ export const executeCommands = async (
           dbType: DIRECTORY_PROVIDER_DATABASE.MYSQL,
           mysql: config.mysql,
           migrationsDirectory: config.migrationFiles,
+          migrateToFilename: config.migrateTo,
         });
     }
   }

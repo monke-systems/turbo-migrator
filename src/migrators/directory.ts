@@ -12,11 +12,35 @@ export type MigrateFromDirectoryOpts = {
   mysql: MysqlConfig;
   migrationsDirectory: string;
   createDatabase: boolean;
+  migrateToFilename?: string;
 };
 
 export type MigrateFromDirectoryResult = {
   appliedFiles: string[];
   log: string;
+};
+
+export type AppliedMigration = {
+  filename: string;
+  applied_at: Date;
+};
+
+const getLatestMysqlAppliedMigration = async (
+  conn: mysql.Connection,
+): Promise<AppliedMigration | undefined> => {
+  await conn.query(`CREATE TABLE IF NOT EXISTS _migrations
+  (
+      filename  VARCHAR(150) PRIMARY KEY           NOT NULL,
+      applied_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
+  ) CHARSET = utf8;
+  `);
+
+  const migrations = await conn.query(
+    'SELECT * FROM _migrations ORDER BY filename DESC LIMIT 1',
+  );
+
+  // @ts-expect-error sorry its unsafe
+  return migrations[0][0] as AppliedMigration;
 };
 
 export const migrateFromDirectory = async (
@@ -45,19 +69,50 @@ export const migrateFromDirectory = async (
       multipleStatements: true,
     });
 
-    const filesToMigrate = glob.sync(opts.migrationsDirectory);
-    logger.info('Found files to migrate', filesToMigrate);
+    const migrationFiles = glob.sync(opts.migrationsDirectory);
+    logger.info('Found migration files', migrationFiles);
+
+    logger.info('Querying latest applied migration');
+    const latestApplied = await getLatestMysqlAppliedMigration(connection);
 
     await connection.beginTransaction();
 
+    const startIndex =
+      latestApplied === undefined
+        ? 0
+        : Number(
+            migrationFiles.findIndex((val) => {
+              return path.basename(val) === latestApplied.filename;
+            }),
+          ) + 1;
+
+    const endIndex =
+      opts.migrateToFilename === undefined
+        ? undefined
+        : migrationFiles.findIndex((val) => {
+            return path.basename(val) === opts.migrateToFilename;
+          });
+
+    const toApply = migrationFiles.slice(startIndex, endIndex);
+
+    logger.info('Migrations to apply list:', toApply);
+
     try {
-      for (const migrationFile of filesToMigrate) {
+      for (const migrationFile of toApply) {
+        const filename = path.basename(migrationFile);
+
         const filePath = path.resolve(opts.migrationsDirectory, migrationFile);
         const content = await fs.readFile(filePath, 'utf-8');
 
         logger.info('Execute', filePath);
         await connection.query(content);
+        await connection.query('INSERT INTO _migrations SET ?', [
+          {
+            filename,
+          },
+        ]);
       }
+
       await connection.commit();
     } catch (e) {
       await connection.rollback();
@@ -69,7 +124,7 @@ export const migrateFromDirectory = async (
     logger.info('Connection closed');
 
     return {
-      appliedFiles: filesToMigrate,
+      appliedFiles: toApply,
       log: logger.flushBuffer().join(),
     };
   } else {
