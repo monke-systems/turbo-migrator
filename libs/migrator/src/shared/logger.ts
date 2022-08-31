@@ -14,7 +14,7 @@ export class Logger {
   constructor(private opts: LoggerOpts = defaultLoggerOpts) {}
 
   info(...args: unknown[]) {
-    const message = `info: ${args.map((a) => format(a)).join(' ')}\n`;
+    const message = `info: ${args.map((a) => format(a)).join(' ')}`;
 
     if (this.opts.enableBuffer) {
       this.buffer.push(message);
@@ -24,7 +24,7 @@ export class Logger {
   }
 
   error(...args: unknown[]) {
-    const message = `error: ${args.map((a) => format(a)).join(' ')}\n`;
+    const message = `error: ${args.map((a) => format(a)).join(' ')}`;
 
     if (this.opts.enableBuffer) {
       this.buffer.push(message);

@@ -1,0 +1,21 @@
+{
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testTimeout": 150000,
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  },
+  "verbose": true,
+  "moduleNameMapper": {
+    "@app/logger/(.*)": "<rootDir>/../libs/logger/src/$1",
+    "@app/logger": "<rootDir>/../libs/logger/src",
+    "@app/migrator/(.*)": "<rootDir>/../libs/migrator/src/$1",
+    "@app/migrator": "<rootDir>/../libs/migrator/src"
+  }
+}

@@ -1,21 +1,33 @@
 {
   "compilerOptions": {
-    "incremental": true,
-    "target": "es6",
     "module": "commonjs",
-    "moduleResolution": "node",
     "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": false,
+    "target": "es2020",
     "sourceMap": true,
     "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
     "strict": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "esModuleInterop": false, // enable if you having problems with compilation
-    "skipLibCheck": true,
-    "noUncheckedIndexedAccess": true,
-    "forceConsistentCasingInFileNames": true,
-    "types": ["node", "jest"]
-  },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "dev-scripts/**/*.ts"],
-  "exclude": ["node_modules"]
+    "paths": {
+      "*": [
+        "node_modules/*"
+      ],
+      "@app/logger": [
+        "libs/logger/src"
+      ],
+      "@app/logger/*": [
+        "libs/logger/src/*"
+      ],
+      "@app/migrator": [
+        "libs/migrator/src"
+      ],
+      "@app/migrator/*": [
+        "libs/migrator/src/*"
+      ]
+    }
+  }
 }

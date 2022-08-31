@@ -7,7 +7,13 @@ env:
   jest: true
 extends:
   - '@monkee/eslint-config/typescript'
+rules:
+  'no-console': error
 overrides:
-  - files: ['tests/files/typeorm-migrations/*.ts']
+  - files: ['migrations/*.ts', 'test/files/typeorm-migrations/*.ts']
     rules:
       '@typescript-eslint/naming-convention': 0
+settings:
+  import/resolver:
+    typescript:
+      project: './tsconfig.json'

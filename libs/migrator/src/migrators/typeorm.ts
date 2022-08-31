@@ -1,38 +1,32 @@
 import * as mysql from 'mysql2/promise';
-import { DataSource } from 'typeorm';
-import type { DataSourceOptions, Migration } from 'typeorm';
+import type { ConnectionOptions } from 'typeorm';
+import { Connection } from 'typeorm';
 import type { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 import { TypeormMigrationErr } from '../errors';
 import { Logger } from '../shared/logger';
+import type { TypeOrmMigrateResult } from '../types';
 import { isError } from '../utils/ts-type-guards';
 
 export type MigrateTypeOrmOpts = {
-  datasource: DataSourceOptions;
+  connectionOpts: ConnectionOptions;
   createDatabase: boolean;
-};
-
-export type TypeOrmMigrateResult = {
-  appliedMigrations: Migration[];
-  log: string;
 };
 
 export const migrateTypeOrm = async (
   opts: MigrateTypeOrmOpts,
 ): Promise<TypeOrmMigrateResult> => {
-  const logger = new Logger({
-    enableBuffer: false,
-  });
+  const logger = new Logger();
 
   try {
     if (opts.createDatabase) {
-      if (!['mysql', 'mariadb'].includes(opts.datasource.type)) {
+      if (!['mysql', 'mariadb'].includes(opts.connectionOpts.type)) {
         throw new TypeormMigrationErr(
           'Currently create database feature with typeorm only available for mysql and mariadb',
         );
       }
 
       const { host, port, username, password } =
-        opts.datasource as MysqlConnectionOptions;
+        opts.connectionOpts as MysqlConnectionOptions;
       const connection = await mysql.createConnection({
         user: username,
         host,
@@ -40,30 +34,30 @@ export const migrateTypeOrm = async (
         password,
       });
 
-      logger.info('Creating database', opts.datasource.database);
+      logger.info('Creating database', opts.connectionOpts.database);
       await connection.query(
-        `CREATE DATABASE IF NOT EXISTS ${opts.datasource.database}`,
+        `CREATE DATABASE IF NOT EXISTS ${opts.connectionOpts.database}`,
       );
       await connection.end();
 
-      logger.info(`Database ${opts.datasource.database} created`);
+      logger.info(`Database ${opts.connectionOpts.database} created`);
     }
 
-    const source = new DataSource(opts.datasource);
+    const conn = new Connection(opts.connectionOpts);
 
-    logger.info('Connecting to datasource', opts.datasource.type);
-    await source.initialize();
-    logger.info('Sucessfully connected to', opts.datasource.type);
+    logger.info('Connecting to datasource', opts.connectionOpts.type);
+    await conn.connect();
+    logger.info('Sucessfully connected to', opts.connectionOpts.type);
 
     logger.info('Run migrations');
-    const res = await source.runMigrations();
+    const res = await conn.runMigrations();
     logger.info('Done! Applied migrations:', res);
 
-    await source.destroy();
+    await conn.close();
 
     return {
       appliedMigrations: res,
-      log: logger.flushBuffer().join(),
+      log: logger.flushBuffer(),
     };
   } catch (e) {
     throw new TypeormMigrationErr(isError(e) ? e.message : 'Unknown err');

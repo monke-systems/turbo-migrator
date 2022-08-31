@@ -2,22 +2,17 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as glob from 'glob';
 import * as mysql from 'mysql2/promise';
-import type { MysqlConfig } from '../config';
-import { DIRECTORY_PROVIDER_DATABASE } from '../config';
 import { DirectoryMigrationErr } from '../errors';
 import { Logger } from '../shared/logger';
+import type { MigratePlainResult, MysqlCreds } from '../types';
+import { DATABASE } from '../types';
 
-export type MigrateFromDirectoryOpts = {
-  dbType: DIRECTORY_PROVIDER_DATABASE;
-  mysql: MysqlConfig;
+export type MigratePlainOpts = {
+  dbType: DATABASE;
+  mysql?: MysqlCreds;
   migrationsDirectory: string;
   createDatabase: boolean;
   migrateToFilename?: string;
-};
-
-export type MigrateFromDirectoryResult = {
-  appliedFiles: string[];
-  log: string;
 };
 
 export type AppliedMigration = {
@@ -43,29 +38,26 @@ const getLatestMysqlAppliedMigration = async (
   return migrations[0][0] as AppliedMigration;
 };
 
-export const migrateFromDirectory = async (
-  opts: MigrateFromDirectoryOpts,
-): Promise<MigrateFromDirectoryResult> => {
-  const logger = new Logger({
-    enableBuffer: false,
-  });
+export const migratePlain = async (
+  opts: MigratePlainOpts,
+): Promise<MigratePlainResult> => {
+  const logger = new Logger();
 
-  if (opts.dbType === DIRECTORY_PROVIDER_DATABASE.MYSQL) {
+  if (opts.dbType === DATABASE.MYSQL) {
     if (opts.createDatabase) {
-      const { database, username, ...withoutDatabase } = opts.mysql;
+      const { database, ...withoutDatabase } = opts.mysql!;
       const conn = await mysql.createConnection(withoutDatabase);
 
-      logger.info('Creating database', opts.mysql.database);
-      await conn.query(`CREATE DATABASE IF NOT EXISTS ${opts.mysql.database}`);
+      logger.info('Creating database', opts.mysql!.database);
+      await conn.query(`CREATE DATABASE IF NOT EXISTS ${opts.mysql!.database}`);
       await conn.end();
     }
 
     logger.info('Started mysql migration');
-    logger.info('Connecting to', opts.mysql.host);
+    logger.info('Connecting to', opts.mysql!.host);
 
-    const { username, ...withoutUsername } = opts.mysql;
     const connection = await mysql.createConnection({
-      ...withoutUsername,
+      ...opts.mysql,
       multipleStatements: true,
     });
 
@@ -101,7 +93,7 @@ export const migrateFromDirectory = async (
       for (const migrationFile of toApply) {
         const filename = path.basename(migrationFile);
 
-        const filePath = path.resolve(opts.migrationsDirectory, migrationFile);
+        const filePath = path.resolve(migrationFile);
         const content = await fs.readFile(filePath, 'utf-8');
 
         logger.info('Execute', filePath);
@@ -125,7 +117,7 @@ export const migrateFromDirectory = async (
 
     return {
       appliedFiles: toApply,
-      log: logger.flushBuffer().join(),
+      log: logger.flushBuffer(),
     };
   } else {
     throw new DirectoryMigrationErr(`Unsupported db type '${opts.dbType}'`);

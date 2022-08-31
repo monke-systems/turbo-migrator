@@ -1,3 +1,6 @@
-# turbo-migrator
+# turbo-migrator 
 
-[Config reference](CONFIG_REFERENCE.MD)
+
+## Config reference
+
+[Link](CONFIG_REFERENCE.MD)

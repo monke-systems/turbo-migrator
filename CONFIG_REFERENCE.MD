@@ -1,24 +1,18 @@
-# Turbo migrator config reference
+# App config reference
 
-**COMMANDS**: array; *required*
+**APP_PORT**: number; *default 3000*
 
-**MIGRATION_PROVIDER**: string; *required*
+**NODE_ENV**: string; *default production*
 
-**MYSQL_DATABASE**: string; *required*
+**APP_VERSION**: string; *default local_version*
 
-**MYSQL_HOST**: string; *required*
+**APP_CORS_ORIGIN**: string; *required*
 
-**MYSQL_PORT**: number; *default 3306*
+**LOG_ENABLED_CONTEXTS**: array; *default *
 
-**MYSQL_USER**: string; *required*
+**LOG_DISABLED_CONTEXTS**: array; *default *
 
-**MYSQL_USER**: string; *required*
+**LOG_ALL_CONTEXTS_ENABLED**: boolean; *default true*
 
-**MYSQL_PASSWORD**: string; *required*
-
-**MIGRATION_FILES**: string; *required*
-
-**MIGRATE_TO**: string;
-
-**CREATE_DATABASE**: boolean; *default false*
+**LOG_COLORS**: boolean; *default false*
 

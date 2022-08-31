@@ -1,60 +1,54 @@
 import { ConfigField } from '@monkee/turbo-config';
+import { Injectable } from '@nestjs/common';
 import { IsEnum, IsOptional } from 'class-validator';
+import type { ConsoleConfig } from '@app/logger';
+import { CONTEXT } from '@app/logger';
 
-export enum MIGRATION_PROVIDER {
-  TYPE_ORM = 'typeorm',
-  DIRECTORY = 'directory',
+export enum NODE_ENV {
+  DEVELOPMENT = 'development',
+  PRODUCTION = 'production',
+  TEST = 'test',
 }
 
-export enum DIRECTORY_PROVIDER_DATABASE {
-  MYSQL = 'mysql',
-}
+@Injectable()
+export class GeneralConfig {
+  @ConfigField()
+  port: number = 3000;
 
-export enum COMMAND {
-  MIGRATE = 'migrate',
-}
+  @ConfigField({ envKey: 'NODE_ENV' })
+  @IsEnum(NODE_ENV)
+  env: NODE_ENV = NODE_ENV.PRODUCTION;
 
-export class MysqlConfig {
+  @ConfigField()
+  version: string = 'local_version';
+
   @ConfigField()
   @IsOptional()
-  database?: string;
-
-  @ConfigField()
-  host!: string;
-
-  @ConfigField()
-  port: number = 3306;
-
-  @ConfigField()
-  user!: string;
-
-  // Same as user, for some libraries
-  @ConfigField({ genericKey: 'user' })
-  username!: string;
-
-  @ConfigField()
-  password!: string;
+  corsOrigin?: string;
 }
 
-export class AppConfig {
+@Injectable()
+export class LoggingConfig implements ConsoleConfig {
   @ConfigField({ arrayOf: 'strings' })
-  @IsEnum(COMMAND, { each: true })
-  commands!: COMMAND[];
+  @IsEnum(CONTEXT, { each: true })
+  enabledContexts: CONTEXT[] = [];
+
+  @ConfigField({ arrayOf: 'strings' })
+  @IsEnum(CONTEXT, { each: true })
+  disabledContexts: CONTEXT[] = [];
 
   @ConfigField()
-  @IsEnum(MIGRATION_PROVIDER)
-  migrationProvider!: MIGRATION_PROVIDER;
+  allContextsEnabled: boolean = true;
 
+  @ConfigField()
+  colors: boolean = false;
+}
+
+@Injectable()
+export class AppConfig {
   @ConfigField({ nested: true })
-  mysql!: MysqlConfig;
+  app!: GeneralConfig;
 
-  @ConfigField()
-  migrationFiles!: string;
-
-  @ConfigField()
-  @IsOptional()
-  migrateTo?: string;
-
-  @ConfigField()
-  createDatabase: boolean = false;
+  @ConfigField({ nested: true, nestedKey: 'log' })
+  logging!: LoggingConfig;
 }

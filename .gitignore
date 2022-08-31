@@ -98,3 +98,6 @@ dist
 # Compiled code
 lib/
 dist/
+
+# Env files
+.env.*.local
