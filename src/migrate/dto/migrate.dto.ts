@@ -26,7 +26,7 @@ export class MysqlCreds {
   @IsString()
   host!: string;
 
-  @ApiPropertyOptional({ example: 'localhost', default: 3306 })
+  @ApiPropertyOptional({ example: 3306, default: 3306 })
   port: number = 3306;
 
   @ApiProperty({ example: 'test_db' })
